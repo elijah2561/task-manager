@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from app import db
 
 class Task(db.Model):
@@ -7,8 +7,22 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    completed = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    completed = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(UTC)
+    )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.completed is None:
+            self.completed = False
 
     def to_dict(self):
         return {
